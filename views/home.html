@@ -1,0 +1,308 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link type="text/css" rel="stylesheet"  href="stylesheets/home.css">
+        <link rel="stylesheet" href="stylesheets/footer.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <script src="javascripts/home.js"></script>
+        <script src="javascripts/searchbar.js"></script>
+        <style>
+            .icon {
+            padding:11px;
+            background: dodgerblue;
+            color: white;
+            min-width: 50px;
+            text-align: center;
+          }
+        </style>
+    </head>
+    
+    <body>
+        <!--header section -->
+        <div class=" container">
+            <div class=" hero-image jumbotron" style="text-align: center;">
+                <h1>ONLINE CLASSES</h1>
+            </div>
+        </div>    
+
+        <div class="container-fluid row">
+                <!--sidebar for courses joined-->
+                <div  class ="hero-image col-2 joined">
+                    <button class="btn btn-info btn-warning btn-block" style="display:none;" id="myBtn">Add Course</button>
+                    <div id="joined_courses" style="margin-top: 15px;">
+                        <h3 class="no-margin btn btn-dark btn-block" >Courses</h3>
+                    </div>
+                    
+                </div>
+
+                <!--middle section main content -->
+                <div id='mainbox' class = "bg-image  col-8 main">
+                    <div id="myModal" class="modal">
+                        <!-- Modal content -->
+                       <div class="modal-content" style="width: 40%;">
+                          <span class="close"> &times; </span>
+                          <form  id="myform" action="/addCourse" method="POST">
+                              <div class='form-group'>
+                                  <h1 style='text-align:center;'> Add Course</h1>
+                              </div>
+                              <div class='form-group'>
+                                  <label class="contorl-label" for='course_name'>Enter Course Name</label>
+                                  <div class="input-group">
+                                      <div class="input-group-addon">
+                                            <span class=" fa fa-university icon"></span>
+                                      </div>
+                                      <input class='form-control' type='text' name='course_name' required>
+                                  </div>     
+                              </div>
+                              <div class='form-group'>
+                                  <label class="control-label" for='mentor'>Enter Mentor Name</label>
+                                  <div class="input-group">
+                                      <div class="input-group-addon">
+                                            <span class="fa fa-user icon"></span>
+                                      </div>
+                                      <input class='form-control' type='text' name='mentor' required>
+                                  </div>    
+                              </div>
+
+                              <div class='form-group'>
+                                  <label for='department'>Department</label>
+                               <!--   <input class='form-control' type='text' name='department' required>   -->
+                                    <select class="form-control" name="department" id="departments">
+                                        <option value="Architecture">Architecture</option>
+                                        <option value="Civil">Civil</option>
+                                        <option value="Computer Science">Computer Science</option>
+                                        <option value="Electrical">Electrical</option>
+                                        <option value="Electronics">Electronics</option>
+                                        <option value="Mechanical">Mechanical</option>
+                                        <option value="MSME">MSME</option>
+                                        <option value="planning">Planning</option>
+                                    </select>
+                              
+                              </div>
+                              <div class='form-group'>
+                                <label class="control-label" for='email'>Email</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <span class="fa fa-envelope icon"></span>
+                                    </div>
+                                    <input class='form-control' type='email' name='email' required>
+                                </div>           
+                            </div>
+                              <div class="form-group">
+                                <div class="input-group">
+                                    <input class='form-control btn btn-success' type="submit" value="Submit">
+                                  <input class='form-control btn btn-danger' type='button' value='cancle' onclick='cancle();'>
+                                </div>    
+                              </div>
+                          </form>
+                        </div>  
+                    </div>
+                      
+                    <nav class="col-12 navbar-expand-sm bg-dark navbar-dark">
+                        <ul class="nav navbar-nav ">  
+                            <li class="nav-item">
+                                <h  class="nav-link" id='placeforusername'  ></h5>
+                            </li>  
+                            <li class="nav-item"  >
+                                <a class="nav-link" href="/logout">Log out</a>
+                            </li>     
+                        </ul>
+                    </nav>
+                        
+                    <div id="searchbar" class="searchbar col-6 offset-4">
+                        <input type="text" class="form-control" id="searchInput" placeholder="search new subject here.." onkeyup="filter()">
+                        <div class="dowpdown-menu" id="searchOptions" style="display:none;" >
+                             
+                        </div>
+                    </div>
+
+                    <div id='coursesbox'>
+                        
+                    </div>
+                    <div id='maincontent' class="col-10 ml-auto">
+                        
+                    </div>
+                    <div id="coursedetails"  style="display:none;">
+                        <hr>
+                        <div id="notes" class="col-10 ml-auto">
+                            <h4>Notes</h4>
+                            <table class="table table-bordered table-sm">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">view</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="notes-body">
+                               
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="assignments" class="col-10 ml-auto">
+                            <h4>Assignment</h4>
+                            <table class="table table-bordered table-sm">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">view</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="assignment-body">
+                               
+                                </tbody>
+                          </table>
+                        </div>
+                                
+                        <div id="submitted-assignments" class="col-10 ml-auto">
+                            <h4>Submitted Assignments</h4>
+                            <table class="table table-bordered table-sm">
+                                <thead  class="thead-dark" id="submitted-assignment-head">
+                                     
+                                </thead>    
+                                <tbody id="submitted-assignment-body">
+                               
+                                </tbody>
+                          </table>
+                        </div>
+                    </div>
+
+                    <div id="faculty"  >
+
+                        <!-- form to add assignment or notes only for faculty-->
+                        <hr>
+                        <h4>Add new Assignment/Notes</h4>
+                        <form action="/addContent" method="POST" enctype="multipart/form-data" class='form form-inline justify-content-center' >
+                            <div class='form-group mr-2'>
+                                <select id="content" name="contentType">
+                                    <option value="assignment">Assignment</option>
+                                    <option value="notes">Notes</option>
+                                </select>    
+                            </div>
+                            <div class='form-group mr-2'>
+                                <input type='text' name='serail' placeholder='Enter serial no'>  
+                            </div>
+                            <div class='form-group mr-2' style="display: none;">
+                                <input id='fc_coursename' type='text' name='course' placeholder='course_name'>
+                            </div>
+                            <div class='form-group mr-2'>
+                                <input type='file' name='file' placeholder='select file'>
+                            </div>
+                            
+                            <div class='form-group mr-2'>
+                                <input class='btn btn-success mr-2' type='submit' value='Submit'><br>
+                            </div>
+   
+                        </form>
+                    </div>   
+                    <div id="student"  >    
+                        <!-- form for student assignment submission-->
+                        <hr>
+                        <h4>Submit new Assignment</h4>
+                        <form action="/submitAssignment" method="POST" enctype="multipart/form-data" class=' form form-inline justify-content-center' >
+                            <div class='form-group mr-2'>
+                                <input type='text' name='serial' placeholder='Enter Assignment no'>  
+                            </div>
+                            
+                            <div class='form-group mr-2' style='display:none;'>
+                                <input id='st_userid' type='text' name='userid' >
+                            </div>
+                            <div class='form-group mr-2' style='display:none;'>
+                                <input id='st_coursename' type='text' name='course'>
+                            </div>
+                            
+                            <div class='form-group mr-2'>
+                                <input type='file' name='file' placeholder='select file'>
+                            </div>
+                             
+                            <div class='form-group mr-2'>
+                                <input class='btn btn-success mr-2' type='submit' value='Submit'><br>
+                            </div>   
+                        </form>  
+                    </div>
+                </div>
+                
+                <!--right side section -->
+                <div class="hero-image col-2 notification">
+                    <div class="col-12">
+                        <h3 class="no-margin btn btn-block btn-dark" >Important Links</h3>
+                        <a class=" no-margin btn btn-info btn-block"  href="http://localhost/documents/Academic_Calendar.pdf" target="_blank">Academic Calander</a>
+                        <a  class=" no-margin btn btn-info btn-block" href="http://localhost/documents/TimeTable.pdf" target="_blank">Time Table</a>
+                        <a  class=" no-margin btn btn-info btn-block" href="http://www.manit.ac.in/content/ex-ug-results-exam-nov-dec-2019" target="_blank"> Exam Schedule</a>
+                   </div>
+
+                    <div class="col-12" style="margin-top: 15px;"> 
+                       <h3 class="no-margin btn btn-block btn-dark">Notification</h3>
+                       <a class="no-margin btn-block btn-warning" href="#">Threre will be test tommorow</a>
+                    </div>
+
+                    <div class="col-12">
+                        
+                    </div>
+
+                    <div class="col-12">
+                        
+                    </div>  
+                </div>
+        </div>
+        <hr>
+
+
+        
+        <!--footer section-->
+        <footer class="container " style="margin-top: 25px;" >
+            <div class="padding jumbotron">
+              <div class="row"> 
+                  <div class="col-9"  style="line-height: 30%" >
+                    <h4 class="float-none">Contact us</h4><br>
+                    <p ><i class="fa fa-facebook"></i> anupamjain007</p>
+                    <p ><i class="fa fa-instagram"></i>_anupam__jain</p>
+                    <p ><i class="fa fa-phone-square "></i>88787809040</p>
+                    <p ><i class="fa fa-envelope"></i> anupamjain1998@gmail.com</p>
+                  </div>
+                  <div class="col-3  " >
+                    <img src="images/developer.jpg" class="rounded-image    "   >
+                    <h4 class="float-none">developer</h4>
+                  </div>
+               </div>   
+            </div>
+          </footer>
+        <hr>
+        <script>
+        	
+        </script>
+        
+        <script>
+            const modal = document.getElementById("myModal");
+            const btn = document.getElementById("myBtn");
+            const span = document.getElementsByClassName("close")[0];
+            
+            const cancle = ()=>{
+            modal.style.display = "none";
+            }
+            btn.onclick = function() {
+                document.getElementById("myform").reset()
+            modal.style.display = "block";
+            }
+        
+            span.onclick = function() {
+            modal.style.display = "none";
+            }
+            
+            window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        </script>
+    
+    </body>
+</html>

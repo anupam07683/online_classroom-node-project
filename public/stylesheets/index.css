@@ -1,0 +1,26 @@
+h1 {
+  text-align: center;
+}
+.signup{
+    box-sizing: border-box;
+    border : 1px solid black;
+    margin : auto;
+    padding :10px 12px ;    
+}
+ 
+ .login{
+    box-sizing: border-box;
+    border : 1px solid black;
+    margin : auto;
+    padding :14px;
+
+} 
+.padding {
+  padding:15px !important;
+}
+.align-center{
+  text-align: center;
+}
+.margin-auto{
+  margin:auto;
+}

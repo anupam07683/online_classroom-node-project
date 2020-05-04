@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        
+        <script>
+             function validate(){
+
+             }
+             function gotoLogin(){
+               document.querySelector("#loginbox").style.display = "block";
+               document.querySelector("#registerbox").style.display = "none"; 
+             }
+             function gotoRegister(){
+               document.querySelector("#registerbox").style.display = "block";
+               document.querySelector("#loginbox").style.display = "none"; 
+             }
+             function selected_faculty(){
+             	document.querySelector("#scholar").style.display = "none";
+                document.querySelector("#semester").style.display = "none";   
+             }
+             function selected_student(){
+             	document.querySelector("#scholar").style.display = "block";
+                document.querySelector("#semester").style.display = "block";   
+             }
+        </script>
+        <style>
+            h1 {
+              text-align: center;
+            }
+            .signup{
+                box-sizing: border-box;
+                border : 1px solid black;
+                margin : auto;
+                padding :10px 12px ;    
+            }
+             
+             .login{
+                box-sizing: border-box;
+                border : 1px solid black;
+                margin : auto;
+                padding :14px;
+
+            }
+        </style>
+
+    </head>
+
+    <body>
+        <div class="jumbotron" style="text-align: center;">
+            <h1> ONLINE CLASSES</h1>
+        </div>
+		<div id="loginbox" class="container-fluid row" >
+            <div class="col-xs-6 login" style="width: 20%;">
+                <form  class="form" action="/login" method="POST">
+                    <div class="form-group">
+                        <h3 style="text-align: center;">Login</h1>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input class="form-control" type="text"   name="username" placeholder="user@gmail.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input class="form-control" type="password"   name="password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <input class="btn btn-primary" type="submit" value="Login">
+                        <input style="float:right;" class="btn btn-success" type="button"  value="SIGN UP" onclick="gotoRegister();">
+                    </div>
+                    <div class="form-group">
+                        <a href="#">forgot password</a>
+                    </div>                    
+                    
+                </form>
+            </div> 
+        </div>
+        
+        <div id="registerbox" class="container-fluid row" style="display:none;">
+<!--Student Registration form -->
+            <div class="col-xs-6 signup" style="width:25%">
+                <form action="/registration" method="POST">
+
+                    <div class="form-group">
+                      <h3 style="text-align: center;">Registration</h1>
+                    </div>
+                    <hr>
+                  
+                    <div class="form-group">
+                      <input class="form-control" type="text"  name="first_name" placeholder="first name" required>
+                    </div>
+
+                    <div class="form-group">
+                      <input class="form-control" type="text"  name="last_name" placeholder="last name">
+                    </div>
+                    
+                    <div class="form-group">
+                      <input   type="radio" id="male" name="gender" value="male">
+                      <label for="male">Male</label>
+                      <input   type="radio" id="female" name="gender" value="female">
+                      <label for="female">Female</label>
+                      <input   type="radio" id="other" name="gender" value="other">
+                      <label for="other">Other</label>   
+                    </div>
+					<div class="form-group">
+                    	<input class="form-control" type="email" name="email" placeholder="email">
+                    </div>
+                    <div class="form-group">
+                    	<input   type="radio" id="student" name="role" value="student" onclick="selected_student();">
+                      	<label for="student">student</label>
+                      	<input   type="radio" id="faculty" name="role" value="faculty" onclick="selected_faculty();">
+                      	<label for="faculty">faculty</label>
+                    </div>
+                    <div class="form-group">   
+                      <input class="form-control" type="text" id="scholar" name="scholar" placeholder="Scholar no" >
+                    </div>
+
+                    <div class="form-group">
+                      <label for="branch">Department</label>
+                      <select class="form-control" name="department" id="department">
+                        <option value="Architecture">Architecture</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Mechanical">Mechanical</option>
+                        <option value="MSME">MSME</option>
+                        <option value="planning">Planning</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                       
+                      <input class="form-control" type="search" id="semester" name="semester" placeholder="semester" >
+                    </div>
+
+                    <div class="form-group">
+                       
+                      <input class="form-control" type="password" id="password" name="password" placeholder="password" required>
+                    </div>
+
+                    <div class="form-group">
+                      <input class="btn btn-primary" type="submit" value="Submit">
+                      <input style="float:right;" class="btn btn-danger" type="button" value="cancle" onclick="gotoLogin();">
+                    </div>  
+
+                </form>
+            </div>
+
+        </div>
+
+        <footer>
+          <div class="jumbotron">
+            <h1> Footer</h1>
+          </div>
+        </footer>
+    </body>
+</html>

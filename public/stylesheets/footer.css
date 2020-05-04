@@ -1,0 +1,12 @@
+.rounded-image{
+  border-radius: 60%;
+  padding:5px;
+  width: 100px;
+}
+
+.jumbotron{
+  background-color: #ccd8ff;
+}
+.float-none{
+  float: none;
+}
