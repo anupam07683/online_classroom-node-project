@@ -50,7 +50,4 @@ Feature of forgot password is also available, someone who have forgotted his/her
 #### *7. forgot password features implementes using opt sent to users registered email addresss using nodemailer*
 ![alt 'forgot password'](/public/screenshots/forgotpassword.png)
 
-=======
-# online-classes-node-project
-This is a project developed using node.JS as backend and Javascript, Html5 and CSS for front end development 
->>>>>>> dc88d96601efe08b05c22585a3003afd342ac407
+======= 
