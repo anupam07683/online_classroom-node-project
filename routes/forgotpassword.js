@@ -1,5 +1,9 @@
-const mysql = require('mysql')
-const mail = require('../routes/mailer')
+const mysql = require('mysql');
+const mail = require('../routes/mailer');
+
+const getModel = require('../model/getModel');
+const updateModel = require('../model/updateModel');
+
 
 DB_DETAILS = {
   host : process.env.HOST,
@@ -13,24 +17,17 @@ This function send a 6 digit otp to the email id that request for forgotpassword
 by using the mailer module 
 */
 exports.generate_otp = (request,response) => {
-  const connection = mysql.createConnection( DB_DETAILS)
-  console.log(request.body)
-   
-  connection.connect((error) => {
-    if(error)
-    {
-      return response.render('forgotpassword',{data: { class: "alert-danger", message: "Error occured try again" }})
-    }
-  })
-  const query = "select email from user where email = ?" 
-  connection.query(query,request.body.email,(error,result) => {
+  getModel.getemail(request,(error,result) => {
     if( error )
     {
       return response.render('forgotpassword',{data: { class: "alert-danger", message: "email does not exits" } })
     }if(result.length > 0){
-      request.session.forgot = request.body.email
-      const re = mail.main(response,request.body.email)
-      return response.render('forgotpassword',{data: { class: "alert-success", message: "email sent to your registered email account" } })
+      request.session.forgot = request.body.email;
+      const re = mail.main(request,response).then(
+        () => {
+          return response.render('forgotpassword',{data: { class: "alert-success", message: "email sent to your registered email account" } })
+        }
+      );
     }
     else {
       return response.render('forgotpassword',{data: { class: "alert-danger", message: "register first" } })
@@ -43,20 +40,11 @@ This function recieves an otp in the request object and confirm if otp is correc
 are render view based on comparision results
 */
 exports.submit_otp = (request,response) => {
-  console.log( DB_DETAILS)
   if(request.session.forgot)
   {
-    var connection = mysql.createConnection(DB_DETAILS);
-    connection.connect((error) => {
-      if(error)
-      {
-        return response.render('forgotpassword',{data:{class:"alert-danger" ,message:'database connection error!! something went wrong'}});
-      } 
-    })
-    
+     
     const time = Date.now() ;
-    let query = "select otp,time from resetpassword where email = ?";
-    connection.query(query,request.session.forgot,(error,result) => {
+    getModel.getotp(request,(error,result) => {
       if(error)
       {
         console.log(error);
@@ -71,7 +59,7 @@ exports.submit_otp = (request,response) => {
           
         }
         else {
-          console.log("not found");
+          console.log(result,time);
           return response.redirect("/forgotpassword");
         }
       }
@@ -94,24 +82,16 @@ exports.reset = (request,response) => {
   {
     const pwd = request.body.password
     const cnf_pwd = request.body.confirm_password
-    if(pwd && cnf_pwd && pwd != cnf_pwd)
-    return response.render('resetpassword',{data:{class:"alert-danger" ,message:'password does not match'}})
-
-    const connection = mysql.createConnection(DB_DETAILS)
-    connection.connect((error)=>{
+    if(pwd && cnf_pwd && pwd != cnf_pwd){
+      return response.render('resetpassword',{data:{class:"alert-danger" ,message:'password does not match'}})
+    }
+    
+    updateModel.updatepassword(request,(error,result)=>{
       if(error)
       {
         return response.render('resetpassword',{data:{class:"alert-danger" ,message:'error !! try again later'}})
       }
-    })
-    const email = request.session.forgot
-    connection.query('update user set password = ? where email = ?',[pwd,email],(error,result)=>{
-      if(error)
-      {
-        return response.render('resetpassword',{data:{class:"alert-danger" ,message:'error !! try again later'}})
-      }
-      else{
-         
+      else{   
         return response.render('index',{data:{class:"alert-success" ,message:'password updated successfully now login'}})
       }
     })

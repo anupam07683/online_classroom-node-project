@@ -1,16 +1,12 @@
-const mysql = require('mysql')
-const db_details = {
-  host : "localhost",
-  database : "college",
-  user : "root",
-  password : "anupam" 
-}
+const fs = require('fs');
+const path = require('path');
 
+const getModel = require('../model/getModel');
+const insertModel = require('../model/insertModel');
 
 //provides course_name of courses  joined by this specific student student
 // provides course_name those courses which created by this specefic faculty
 exports.loadcourses =  ((request,response) =>{
-  
   console.log(request.session.userid)
   console.log(request.session.usertype)
 
@@ -20,44 +16,23 @@ exports.loadcourses =  ((request,response) =>{
     "error":"unauthorized access"
   })
 
-  var connection = mysql.createConnection(db_details);
-  connection.connect( (err)=>{
-      if(err)
-      {
-        console.log("error connecting database")
-        return response.send({
-          'status' : -1,
-          'usertype':request.session.usertype,
-          'error':'error connecting database'
-        })
-      }
- 
-  })
-
-  let query
-  if(request.session.usertype == 'student')
-  query =  `select course_name from joined where email = ?`
-  else if(request.session.usertype == 'faculty')
-  query = `select course_name from courses where email= ?`
-
-  connection.query(query,request.session.userid,(err,results) => {
-    if(err){
+  getModel.getcoursejoined(request,(error,result) => {
+    if(error)
+    {
       return response.send({
         'status' : -1,
         'usertype':request.session.usertype,
         'error':err
       })
-    }
-    else{
-      //console.log(results)
+    }else{
       return response.send({
         'status':200,
         'usertype' : request.session.usertype,
         'userid' : request.session.userid,
-        "data":results
+        "data":result
       });
-    } 
-  })
+    }
+  }) 
 })
 
 
@@ -73,94 +48,53 @@ exports.loadcoursedata = (request,response) => {
       "error":"unauthorized user"
     })
   }
-  console.log(request.body)
-  const course_name = request.body.name
-  let connection  = mysql.createConnection(db_details)
-  connection.connect((err) => {
-    if(err){
-      return response.send({
-        "status":-1,
-        "error" : error
-      })
-    }
-  })
-  var coursedetails
-  connection.query('select * from courses where course_name = ?',course_name,(error,results)=>{
+  console.log(request.body);
+   
+  getModel.getcourseDetails(request,(error,coursedetails) => {
     if(error)
     {
       return response.send({
         'status':-1,
         'error':error
+      });
+    }else{
+      getModel.getassignments(request,(error,assignment) => {
+        if(error){
+          return response.send({
+            'status':-1,
+            'error':error
+          })
+        }else{
+          getModel.getnotes(request,(error,notes) => {
+            if(error){
+              return response.send({
+                'status':-1,
+                'error':error
+              })
+            }else{
+              
+              getModel.getsubmittedAssignment(request,(error,submittedAssignment) =>{
+                if(error){
+                  return response.send({
+                    'status':-1,
+                    'error':error
+                  })
+                }else{
+                  return response.send({
+                    'status':200,
+                    'usertype' : request.session.usertype,
+                    'userid'   : request.session.userid,
+                    "notes"    : JSON.stringify(notes),
+                    "assignment":JSON.stringify(assignment),
+                    "details"  :JSON.stringify(coursedetails),
+                    "submittedAssignment":JSON.stringify(submittedAssignment)
+                  })
+                }
+              })
+            }
+          })
+        }
       })
-    }
-    else {
-      coursedetails = results
-      //console.log(JSON.stringify(results))
-    }
-  })
-
-  let usertype = request.session.usertype
-  let email = request.session.userid 
-  let submittedAssignment;
-  let query
-  if(usertype == "student")
-  {
-    query = `select assignment_no,name from submitted where  course_name = ? and email = ? `
-    connection.query(query,[course_name,email],(error,result) => {
-      if(error){
-        return response.send({
-          'status':-1,
-          'error':error
-        })
-      }else{
-         submittedAssignment = result
-      }
-    })
-  }
-  
-  if(usertype == 'faculty'){
-    query = 'select scholar,assignment_no,name from submitted inner join user on submitted.EMAIL = user.EMAIL where course_name = ?'
-    connection.query(query,[course_name],(error,result) => {
-      if(error){
-        return response.send({
-          'status':-1,
-          'error':error
-        })
-      }else{
-         submittedAssignment = result
-      }
-    })
-  }
-  
-  var assignment 
-  connection.query('select PATH from assignment where COURSE_NAME=?',course_name,(err,results) => {
-    if(err)
-    {
-      return request.send({"status" : 'cannot fetch data'})
-    }
-    else {
-      assignment = results
-      //response.send(JSON.stringify(results))
-    }
-  })
-  var notes 
-  connection.query('select path from notes where course_name=?',course_name,(err,results) => {
-    if(err)
-    {
-      return request.send({"status" : 'cannot fetch data'})
-    }
-    else { 
-      notes = results
-      //console.log(results)
-      return response.send({
-        'status':200,
-        'usertype' : request.session.usertype,
-        'userid'   : request.session.userid,
-        "notes"    : JSON.stringify(notes),
-        "assignment":JSON.stringify(assignment),
-        "details"  :JSON.stringify(coursedetails),
-        "submittedAssignment":JSON.stringify(submittedAssignment)
-      })       
     }
   })  
 }
@@ -184,34 +118,16 @@ const validateCourseDetails = (request) => {
 
 //add a new course this feature is only available for the faculties
 exports.addCourse = (request,response) => {
-
   if(!request.session.userid)
-  return response.redirect('/')
-
+  {
+    return response.redirect('/')
+  }
   const validate = validateCourseDetails(request)
   if(validate == false)
   {
     return response.render('home',{data:{class:'alert-danger',message:'incomplete or incorrect details'}})
   }
-  const connection = mysql.createConnection(db_details)
-  connection.connect((err)=>{
-    if(err)
-    return response.send({
-        'status':-1,
-        "error":error
-    })
-  })
-  const date = new Date()
-  const coursedata = {
-    "course_name": request.body.course_name,
-    "mentor":request.body.mentor,
-    "department" : request.body.department,
-    "email" : request.body.email,
-    "created":date
-
-  }
-  //console.log(request.body)
-  connection.query('INSERT INTO COURSES SET ?', coursedata,(error,results)=>{
+  insertModel.addcourse(request, (error,result)=>{
     if(error){
       return response.send({
         'status':-1,
@@ -219,8 +135,6 @@ exports.addCourse = (request,response) => {
       })
     }
     else {
-      const fs = require('fs')
-      const path = require('path')
       const course_name = (request.body.course_name).replace(/\s/g,"_")
       fs.mkdir(path.join('./data/notes',course_name),(err) => { 
         if (err) { 
@@ -246,7 +160,6 @@ exports.addCourse = (request,response) => {
 //provides the list of all the courses except those which are created by this specific faculty
 //provides the list of all the courses except those which are joined by this specific faculty
 exports.getAllCourses = (request,response) => {
-  console.log('request received getAllCourses')
   if(!request.session.usertype || !request.session.userid)
   {
     return response.send({
@@ -254,53 +167,20 @@ exports.getAllCourses = (request,response) => {
       "error":  "incorrect details"
     })
   }
-  const connection = mysql.createConnection(db_details)
-  connection.connect((error)=>{
+  getModel.getcoursenames(request,(error,result) => {
     if(error)
     {
-      return  response.send({
+      return response.send({
         "status":-1,
-        'error':'connection error'
+        'error':'erros executing query'
+      })
+    }else{
+      return response.send({
+        'status':200,
+        'result':JSON.stringify(result)
       })
     }
-  })
-  if(request.session.usertype == 'student'){
-    const username = request.session.userid
-    connection.query('select course_name from courses where course_name not in (select course_name from joined where email = ?)',[username],(error,result) =>{
-      if(error){
-        return response.send({
-          "status":-1,
-          "error":error,
-        })
-      }else{
-       // console.log(result)
-        return response.send({
-          'status' : 200,
-          'result':JSON.stringify(result)
-        })
-      }
-    })
-  }else if(request.session.usertype == 'faculty'){
-    connection.query(`select course_name from courses where email  !=?`,request.session.userid,(error,result) =>{
-      if(error){
-        return response.send({
-          "status":-1,
-          'error':'erros executing query'
-        })
-      }else{
-        return response.send({
-          'status':200,
-          'result':JSON.stringify(result)
-        })
-      }
-    })
-  } 
-  else{
-    return response.send({
-      'status':200,
-      'result':JSON.stringify(result)
-    })
-  } 
+  })    
 }
 
 
@@ -314,7 +194,6 @@ exports.joinCourse = (request,response)=>{
       "error" : "can not fulfill this request"
     })
   }
-
   const usertype = request.session.usertype
   if(!usertype || usertype == 'faculty'){
     return request.send({
@@ -322,35 +201,22 @@ exports.joinCourse = (request,response)=>{
       "error" : "join a course in not facilitate for faculty"
     })
   }
-  const connection = mysql.createConnection(db_details)
-  connection.connect((error)=>{
-    if(error){
-      return  response.send({
-        'status':-1,
-        'error':'error connecting database'
-      })
-    }
-  })
-  let values = {
-    "email" : request.session.userid,
-    "course_name" : request.body.course_name
-  }
-  console.log(values)
-  connection.query('insert into joined SET ?',values,(error,result)=>{
-    if(error){
+  insertModel.joincourse(request,(error,result) => {
+    if(error)
+    {
       return  response.send({
         'status':-1,
         'error': error
       })
-    }else {
-      console.log('course joined successfully')
+    }
+    else{
       return response.send({
         'status':200,
         'success':'joined successfully'
       })
     }
-  })
-  }
+  }) 
+}
 
 
 
@@ -364,30 +230,21 @@ exports.getCourseDetails = (request,response) => {
       "error":'course_name not defined'
     })
   }
-  let query = 'select * from courses where course_name = ?'
-  const connection = mysql.createConnection(db_details)
-  connection.connect((error) => {
+  getModel.getcourseDetails(request,(error,result) => {
     if(error)
     {
-      return response.send({
-        "status":-1,
-        "error":error
-      })
-    }
-  })
-  connection.query(query,request.body.course_name,(error,results) => {
-    if(error){
+      console.log("getcoursedetails" ,error)
       return response.send({
         "status":-1,
         "error":error
       })
     }else{
+      console.log("course details" ,result)
       return response.send({
         'status':200,
         'usertype':request.session.usertype,
-        'details':JSON.stringify(results)
+        'details':JSON.stringify(result)
       })
     }
   })
-
 }

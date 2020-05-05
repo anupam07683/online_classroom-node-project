@@ -84,7 +84,8 @@ router.get('/forgotpassword',function(req,res,next){
 
 /*GET resetpassword page */
 router.all('/resetpassword',function(req,res,next){
-  if(req.session.submitted_otp)
+  console.log(req.session.otp_submitted)
+  if(req.session.otp_submitted)
   res.render('resetpassword',{ data: 'Express' })
   else
   res.redirect('/forgotpassword')
