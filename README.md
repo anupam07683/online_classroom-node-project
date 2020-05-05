@@ -2,8 +2,8 @@
 
 ## **Introduction**
 This is a basic and simple project developed using Node.js. A user can register either as a student or as a faculty both have different views. A student can join a course created by faculty and can download the assignment and notes of the corresponding course provided by the faculty also student can submit the solution to the assignments provided in the courses content <br> 
-A faculty can create any new course and can add content to the course (assignments and notes). Assignments which are submitted by subscribers of the course will be available for the download for the download (scholar wise).<br>
-Feature of forgot password is also available, someone who have forgotten his/her password can ask for forgot password. User can reset his/her password using a 6-digit OTP which will be provided in the registered email once he/she asked for forgot password, OTP is valid only for the next five minutes.
+A faculty can create any new course and can add content to the course (assignments and notes). Assignments which are submitted by subscribers of the course will be available for the download for the download (scholar wise) <br>
+Feature of forgot password is also available, someone who have forgotten his/her password can ask for forgot password. User can reset his/her password using a 6-digit OTP (one time password) which will be provided in the registered email once he/she asked for forgot password, OTP is valid only for the next five minutes.
 
 #### Technology used
 * Html5
@@ -49,4 +49,4 @@ Feature of forgot password is also available, someone who have forgotten his/her
 #### *7. forgot password features implementes using opt sent to users registered email addresss using nodemailer*
 ![alt 'forgot password'](/public/screenshots/forgotpassword.png)
 
-=== 
+======= 
