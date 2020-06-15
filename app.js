@@ -31,6 +31,18 @@ const options = {
     res.set('x-timestamp', Date.now())
   }
 }
+
+const options1 = {
+  dotfiles: 'ignoresdf',
+  etag: false,
+  extensions: ['htm', 'html','css'],
+  index: false,
+  maxAge: '2d',
+  redirect: true,
+  setHeaders: function (res, path, stat) {
+    res.set('x-timestamp', Date.now())
+  }
+}
 const TWO_HOURS = 1000 * 60 * 60 * 2
 app.use(session({
   name : 'sid',
